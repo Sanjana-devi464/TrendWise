@@ -10,9 +10,8 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   
   // Output configuration for production builds
-  ...(process.env.NODE_ENV === 'production' && {
-    output: 'standalone',
-  }),
+  // Remove standalone output for Vercel
+  // output: 'standalone',
   
   // Memory optimization settings
   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
@@ -175,7 +174,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Access-Control-Allow-Origin',
-            value: process.env.NODE_ENV === 'development' ? '*' : 'https://your-domain.com'
+            value: process.env.NODE_ENV === 'development' ? '*' : process.env.NEXTAUTH_URL || 'https://trendwise.vercel.app'
           },
           {
             key: 'Access-Control-Allow-Methods',

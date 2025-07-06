@@ -28,11 +28,11 @@ if (!global.mongoose) {
 
 const defaultConnectionOptions: mongoose.ConnectOptions = {
   bufferCommands: false,
-  maxPoolSize: 10, // Maintain up to 10 socket connections
+  maxPoolSize: 2, // Reduce for serverless
   serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
   socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
   family: 4, // Use IPv4, skip trying IPv6
-  // Performance optimizations
+  // Performance optimizations for serverless
   autoIndex: false, // Don't build indexes
   maxIdleTimeMS: 30000, // Close connections after 30 seconds of inactivity
   heartbeatFrequencyMS: 10000, // Heartbeat every 10 seconds

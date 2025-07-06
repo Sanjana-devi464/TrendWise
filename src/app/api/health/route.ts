@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import dbConnect from '@/lib/mongodb';
 
 export async function GET(_request: NextRequest) {
   try {
@@ -11,16 +10,22 @@ export async function GET(_request: NextRequest) {
       HAS_NEXTAUTH_SECRET: !!process.env.NEXTAUTH_SECRET,
       HAS_NEXTAUTH_URL: !!process.env.NEXTAUTH_URL,
       NODE_ENV: process.env.NODE_ENV,
+      VERCEL: !!process.env.VERCEL,
     };
 
-    // Check database connection
-    let dbStatus = 'disconnected';
-    try {
-      await dbConnect();
-      dbStatus = 'connected';
-    } catch (error) {
-      console.error('Database connection error:', error);
-      dbStatus = `error: ${error instanceof Error ? error.message : 'Unknown error'}`;
+    // For Vercel, skip database connection test to avoid timeout
+    let dbStatus = 'not-tested-on-vercel';
+    
+    if (!process.env.VERCEL) {
+      // Only test database connection in development
+      try {
+        const { default: dbConnect } = await import('@/lib/mongodb');
+        await dbConnect();
+        dbStatus = 'connected';
+      } catch (error) {
+        console.error('Database connection error:', error);
+        dbStatus = `error: ${error instanceof Error ? error.message : 'Unknown error'}`;
+      }
     }
 
     return NextResponse.json({
