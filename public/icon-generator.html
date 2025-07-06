@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generate Icon</title>
+</head>
+<body>
+    <canvas id="canvas" width="192" height="192"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Create gradient
+        const gradient = ctx.createLinearGradient(0, 0, 192, 192);
+        gradient.addColorStop(0, '#3b82f6');
+        gradient.addColorStop(1, '#8b5cf6');
+        
+        // Fill background
+        ctx.fillStyle = gradient;
+        ctx.roundRect(0, 0, 192, 192, 19.200000000000003);
+        ctx.fill();
+        
+        // Add text
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 48px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('T', 96, 96);
+        
+        // Add accent dot
+        ctx.beginPath();
+        ctx.arc(144, 48, 15.36, 0, 2 * Math.PI);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.fill();
+        
+        // Download the image
+        const link = document.createElement('a');
+        link.download = 'icon-192x192.png';
+        link.href = canvas.toDataURL();
+        // link.click(); // Uncomment to auto-download
+        
+        console.log('Generated icon for 192x192');
+    </script>
+</body>
+</html>
