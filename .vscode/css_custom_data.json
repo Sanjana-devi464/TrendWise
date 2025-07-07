@@ -50,16 +50,6 @@
           "url": "https://tailwindcss.com/docs/functions-and-directives#screen"
         }
       ]
-    },
-    {
-      "name": "@variants",
-      "description": "Tailwind CSS directive to generate variants",
-      "references": [
-        {
-          "name": "Tailwind CSS Documentation",
-          "url": "https://tailwindcss.com/docs/functions-and-directives#variants"
-        }
-      ]
     }
   ]
 }
