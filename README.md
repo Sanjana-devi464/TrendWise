@@ -2,9 +2,12 @@
 
 > ✅ **Production Ready** | **Next.js 15+** | **95+ Lighthouse Score** | **AI-Powered Content**
 
-🚀 **[Live Demo](https://trendwise.vercel.app)** | 🔧 **[Admin Panel](https://trendwise.vercel.app/admin)** | 📚 **[Documentation](https://docs.trendwise.com)**
+🚀 **[Live Demo](https://trend-wise-kappa.vercel.app/)**
 
 TrendWise is a cutting-edge blog platform that combines AI content generation with trending topic discovery. Built with Next.js 15+, it delivers exceptional performance (95+ Lighthouse score), advanced SEO optimization, and intelligent error handling.
+
+![image](https://github.com/user-attachments/assets/ef2a833f-3b86-4b66-90db-4f3293b3906b)
+
 
 ## ⚡ Performance Highlights
 
@@ -14,6 +17,9 @@ TrendWise is a cutting-edge blog platform that combines AI content generation wi
 | **Database Queries** | 60% faster | Better UX |
 | **Core Web Vitals** | All Green ✅ | SEO boost |
 | **Lighthouse Score** | 95+ | Optimal performance |
+
+![image](https://github.com/user-attachments/assets/b3a9ba85-fbaf-46f5-bf83-81a28d4e8f2b)
+
 
 ## 🚀 Key Features
 
@@ -42,6 +48,9 @@ TrendWise is a cutting-edge blog platform that combines AI content generation wi
 - **Responsive Design** - Mobile-first with TailwindCSS
 - **WCAG 2.1 Compliant** - Full accessibility support
 - **Smooth Animations** - Optimized micro-interactions
+
+![image](https://github.com/user-attachments/assets/ef326ba5-a62c-4c87-baea-2a11cb9f6693)
+
 
 ## 🛠️ Tech Stack
 
@@ -74,6 +83,9 @@ Open [http://localhost:3000](http://localhost:3000) to view the application.
 2. **Google OAuth:** [Console](https://console.cloud.google.com/) → Create credentials
 3. **MongoDB:** Local installation or [MongoDB Atlas](https://cloud.mongodb.com/)
 4. **Gemini API:** [AI Studio](https://makersuite.google.com/app/apikey)
+
+![image](https://github.com/user-attachments/assets/9292f0b1-774c-4851-8529-dac12b09a5ae)
+
 
 ## 🔧 Development Scripts
 
@@ -163,16 +175,13 @@ npm run dev
 
 ## 🔗 Links
 
-- **[Live Demo](https://trendwise.vercel.app)** - Try the live application
-- **[Admin Panel](https://trendwise.vercel.app/admin)** - Content management
-- **[GitHub](https://github.com/yourusername/trendwise)** - Source code
-- **[Documentation](https://docs.trendwise.com)** - Full docs
+- **[Live Demo](https://trend-wise-kappa.vercel.app/)** - Try the live application
+- **[GitHub](https://github.com/Sanjana-devi464/trendwise)** - Source code
 
 ## 🆘 Support
 
-- **Email**: [support@trendwise.com](mailto:support@trendwise.com)
-- **Discord**: [Community Server](https://discord.gg/trendwise)
-- **GitHub Issues**: [Report bugs](https://github.com/yourusername/trendwise/issues)
+- **Email**: [sanjanash464@gmail.com](mailto:sanjanash464@gmail.com)
+- **GitHub Issues**: [Report bugs](https://github.com/Sanjana-devi464/trendwise/issues)
 
 ---
 
