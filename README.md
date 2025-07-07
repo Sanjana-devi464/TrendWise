@@ -1,4 +1,4 @@
-# TrendWise - AI-Powered Blog Platform
+![image](https://github.com/user-attachments/assets/49009d8d-d53c-418d-a2f5-99216db12c9e)# TrendWise - AI-Powered Blog Platform
 
 > ✅ **Production Ready** | **Next.js 15+** | **95+ Lighthouse Score** | **AI-Powered Content**
 
@@ -63,7 +63,7 @@ TrendWise is a cutting-edge blog platform that combines AI content generation wi
 
 ```bash
 # Clone & install
-git clone https://github.com/yourusername/trendwise.git
+git clone https://github.com/Sanjana-devi464/trendwise.git
 cd trendwise
 npm install
 
@@ -160,7 +160,7 @@ We welcome contributions!
 
 ### Development
 ```bash
-git clone https://github.com/yourusername/trendwise.git
+git clone https://github.com/Sanjana-devi464/trendwise.git
 cd trendwise
 npm install
 cp .env.example .env.local
