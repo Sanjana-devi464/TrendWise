@@ -57,3 +57,22 @@ next-env.d.ts
 # OS files
 Thumbs.db
 desktop.ini
+
+# Test and debug files
+test-*.js
+test-*.ts
+test-*.jsx
+test-*.tsx
+*test*.jpg
+*test*.png
+*test*.gif
+debug-*.js
+debug-*.ts
+*debug*.log
+*.test.*
+*.spec.*
+
+# Temporary development files
+scripts/test-*
+scripts/debug-*
+scripts/temp-*
