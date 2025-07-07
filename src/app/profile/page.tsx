@@ -31,8 +31,14 @@ export default function ProfilePage() {
     }
   }, [session]);
 
+  // Handle redirect on client side
+  useEffect(() => {
+    if (session === null) {
+      router.push('/login');
+    }
+  }, [session, router]);
+
   if (!session) {
-    router.push('/login');
     return null;
   }
 

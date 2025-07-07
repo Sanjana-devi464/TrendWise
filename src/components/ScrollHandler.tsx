@@ -1,9 +1,17 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function ScrollHandler() {
+  const [isClient, setIsClient] = useState(false);
+
   useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isClient) return;
+
     // Handle hash scrolling when component mounts
     const handleHashScroll = () => {
       const hash = window.location.hash;
@@ -18,9 +26,7 @@ export default function ScrollHandler() {
           }, 100);
         }
       }
-    };
-
-    // Handle initial hash on page load
+    };    // Handle initial hash on page load
     handleHashScroll();
 
     // Handle hash changes
@@ -29,11 +35,11 @@ export default function ScrollHandler() {
     };
 
     window.addEventListener('hashchange', handleHashChange);
-    
+
     return () => {
       window.removeEventListener('hashchange', handleHashChange);
     };
-  }, []);
+  }, [isClient]);
 
   return null;
 }

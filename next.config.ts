@@ -23,24 +23,27 @@ const nextConfig: NextConfig = {
       sideEffects: false,
     };
     
-    // Reduce chunk size for better memory management
-    config.optimization.splitChunks = {
-      chunks: 'all',
-      cacheGroups: {
-        vendor: {
-          test: /[\\/]node_modules[\\/]/,
-          name: 'vendors',
-          priority: 10,
-          reuseExistingChunk: true,
+    // Only apply client-side optimizations for client bundle
+    if (!isServer) {
+      // Reduce chunk size for better memory management
+      config.optimization.splitChunks = {
+        chunks: 'all',
+        cacheGroups: {
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            priority: 10,
+            reuseExistingChunk: true,
+          },
+          common: {
+            name: 'common',
+            minChunks: 2,
+            priority: 5,
+            reuseExistingChunk: true,
+          },
         },
-        common: {
-          name: 'common',
-          minChunks: 2,
-          priority: 5,
-          reuseExistingChunk: true,
-        },
-      },
-    };
+      };
+    }
     
     // Reduce memory usage during builds
     if (!dev) {
@@ -116,8 +119,9 @@ const nextConfig: NextConfig = {
   // Experimental features for better performance
   experimental: {
     optimizePackageImports: ['lucide-react', '@headlessui/react'],
-    webpackBuildWorker: true,
-    memoryBasedWorkersCount: true,
+    // Disable these features that might cause SSR issues
+    // webpackBuildWorker: true,
+    // memoryBasedWorkersCount: true,
     optimizeCss: true,
   },
 
