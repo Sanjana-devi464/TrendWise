@@ -17,7 +17,6 @@
     "lint:fix": "cross-env NODE_OPTIONS=\"--max-old-space-size=2048\" next lint --fix",
     "type-check": "cross-env NODE_OPTIONS=\"--max-old-space-size=2048\" tsc --noEmit",
     "analyze": "cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" ANALYZE=true npm run build",
-    "fix-validation": "cross-env NODE_OPTIONS=\"--max-old-space-size=2048\" npx tsx scripts/fix-article-validation.ts",
     "optimize": "npm run lint:fix && npm run type-check && npm run build",
     "optimize:full": "npm run clean && npm run optimize",
     "performance": "npm run build && npm run analyze",
@@ -28,9 +27,6 @@
     "memory-check": "node scripts/memory-optimization.js",
     "memory-optimize": "powershell -ExecutionPolicy Bypass -File scripts/optimize-memory.ps1",
     "prebuild": "npm run memory-check",
-    "check-config": "node scripts/check-config.js",
-    "check-turbopack": "node scripts/check-turbopack.js",
-    "fix-turbo": "node scripts/fix-turbopack.js",
     "preinstall": "npx only-allow npm",
     "postinstall": "next telemetry disable"
   },

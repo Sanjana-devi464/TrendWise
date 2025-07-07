@@ -6,10 +6,12 @@ import { memo } from 'react';
 function Providers({ children }: { children: React.ReactNode }) {
   return (
     <SessionProvider
-      // More frequent session checks for better sync
-      refetchInterval={60} // 1 minute
+      // Reduce session checks to avoid overwhelming the server
+      refetchInterval={5 * 60} // 5 minutes
       refetchOnWindowFocus={true} // Enable refetch on window focus
       refetchWhenOffline={false} // Don't refetch when offline
+      // Ensure session is properly initialized
+      basePath="/api/auth"
     >
       {children}
     </SessionProvider>

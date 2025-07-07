@@ -3,6 +3,16 @@ import GoogleProvider from 'next-auth/providers/google';
 import dbConnect from './mongodb';
 import User from '@/models/User';
 
+// Validate environment variables on startup
+console.log('🔧 Auth environment validation:', {
+  hasSecret: !!process.env.NEXTAUTH_SECRET,
+  hasGoogleClientId: !!process.env.GOOGLE_CLIENT_ID,
+  hasGoogleClientSecret: !!process.env.GOOGLE_CLIENT_SECRET,
+  hasNextAuthUrl: !!process.env.NEXTAUTH_URL,
+  hasMongodbUri: !!process.env.MONGODB_URI,
+  nodeEnv: process.env.NODE_ENV
+});
+
 // Cache user lookups to reduce database calls
 const userCache = new Map<string, { user: any; timestamp: number }>();
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
@@ -57,6 +67,25 @@ export const authOptions: NextAuthOptions = {
         sameSite: 'lax',
         path: '/',
         secure: process.env.NODE_ENV === 'production',
+        maxAge: 30 * 24 * 60 * 60, // 30 days
+      },
+    },
+    callbackUrl: {
+      name: `next-auth.callback-url`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+      },
+    },
+    csrfToken: {
+      name: `next-auth.csrf-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
       },
     },
   },
@@ -71,55 +100,11 @@ export const authOptions: NextAuthOptions = {
       if (account?.provider === 'google') {
         try {
           await dbConnect();
-          
-          // Check if user exists using cached lookup
-          let existingUser = await getCachedUser(user.email!);
-          
-          if (!existingUser) {
-            // Check if this is the first user (make them admin)
-            const userCount = await User.countDocuments();
-            const isFirstUser = userCount === 0;
-            
-            console.log('📝 Creating new user:', { email: user.email, isFirstUser });
-            
-            // Create new user
-            existingUser = await User.create({
-              name: user.name,
-              email: user.email,
-              image: user.image,
-              role: isFirstUser ? 'admin' : 'user',
-              emailVerified: new Date()
-            });
-            
-            // Update cache
-            userCache.delete(`user:${user.email}`);
-            console.log('✅ New user created successfully');
-          } else {
-            console.log('👤 Existing user found, updating if needed');
-            // Update existing user info if needed
-            let needsUpdate = false;
-            if (user.name && existingUser.name !== user.name) {
-              existingUser.name = user.name;
-              needsUpdate = true;
-            }
-            if (user.image && existingUser.image !== user.image) {
-              existingUser.image = user.image;
-              needsUpdate = true;
-            }
-            
-            if (needsUpdate) {
-              await existingUser.save();
-              // Invalidate cache
-              userCache.delete(`user:${user.email}`);
-              console.log('✅ User info updated');
-            }
-          }
-          
           console.log('✅ SignIn callback completed successfully');
           return true;
         } catch (error) {
           console.error('❌ Error in signIn callback:', error);
-          // Return true to allow sign-in even if database operation fails
+          // Return true to allow sign-in even if database connection fails
           return true;
         }
       }
@@ -127,6 +112,12 @@ export const authOptions: NextAuthOptions = {
       return true;
     },
     async jwt({ token, user, account }) {
+      console.log('🔄 JWT callback triggered:', { 
+        tokenEmail: token.email, 
+        userEmail: user?.email, 
+        provider: account?.provider 
+      });
+      
       // When user signs in for the first time
       if (account && user) {
         try {
@@ -140,6 +131,8 @@ export const authOptions: NextAuthOptions = {
             const userCount = await User.countDocuments();
             const isFirstUser = userCount === 0;
             
+            console.log('📝 Creating new user in JWT:', { email: user.email, isFirstUser });
+            
             // Create new user
             existingUser = await User.create({
               name: user.name,
@@ -151,7 +144,9 @@ export const authOptions: NextAuthOptions = {
             
             // Update cache
             userCache.delete(`user:${user.email}`);
+            console.log('✅ New user created successfully in JWT');
           } else {
+            console.log('👤 Existing user found in JWT, updating if needed');
             // Update existing user info if needed
             let needsUpdate = false;
             if (user.name && existingUser.name !== user.name) {
@@ -167,21 +162,23 @@ export const authOptions: NextAuthOptions = {
               await existingUser.save();
               // Invalidate cache
               userCache.delete(`user:${user.email}`);
+              console.log('✅ User info updated in JWT');
             }
           }
           
           // Add user data to token
           token.role = existingUser.role;
           token.userId = existingUser._id.toString();
+          console.log('✅ JWT token updated with user data');
         } catch (error) {
-          console.error('Error in JWT callback:', error);
+          console.error('❌ Error in JWT callback:', error);
           // Set fallback values instead of throwing
           token.role = 'user';
-          token.userId = user.id || '';
+          token.userId = user.id || token.sub || '';
         }
       }
       
-      // If token already has role, keep it
+      // For subsequent requests, try to refresh user data if missing
       if (!token.role || !token.userId) {
         try {
           await dbConnect();
@@ -189,13 +186,15 @@ export const authOptions: NextAuthOptions = {
           if (dbUser) {
             token.role = dbUser.role;
             token.userId = dbUser._id.toString();
+            console.log('✅ JWT token refreshed with user data');
           } else {
             // Fallback if user not found in database
             token.role = 'user';
             token.userId = token.sub || '';
+            console.log('⚠️ Using fallback user data in JWT');
           }
         } catch (error) {
-          console.error('Error fetching user role:', error);
+          console.error('❌ Error fetching user role in JWT:', error);
           // Set fallback values
           token.role = 'user';
           token.userId = token.sub || '';
@@ -226,44 +225,24 @@ export const authOptions: NextAuthOptions = {
       };
     },
     async redirect({ url, baseUrl }) {
-      // Handle localhost properly in development
-      const actualBaseUrl = process.env.NEXTAUTH_URL || baseUrl;
+      console.log('🔄 Redirect callback:', { url, baseUrl });
       
-      console.log('🔄 Redirect callback:', { url, baseUrl: actualBaseUrl });
-      
-      // If signing in, always redirect to home page
-      if (url.includes('/api/auth/signin') || url.includes('/login')) {
-        console.log('✅ Redirecting to home after signin');
-        return actualBaseUrl;
+      // If url is already a complete URL with the same origin, use it
+      if (url.startsWith(baseUrl)) {
+        console.log('✅ Same origin redirect:', url);
+        return url;
       }
       
-      // If signing out, redirect to home page
-      if (url.includes('/api/auth/signout')) {
-        console.log('✅ Redirecting to home after signout');
-        return actualBaseUrl;
+      // If url is relative, make it absolute
+      if (url.startsWith('/')) {
+        const redirectUrl = `${baseUrl}${url}`;
+        console.log('✅ Relative URL redirect:', redirectUrl);
+        return redirectUrl;
       }
       
-      // Allows relative callback URLs
-      if (url.startsWith("/")) {
-        console.log('✅ Relative URL redirect:', `${actualBaseUrl}${url}`);
-        return `${actualBaseUrl}${url}`;
-      }
-      
-      // Allows callback URLs on the same origin
-      try {
-        const urlOrigin = new URL(url).origin;
-        const baseOrigin = new URL(actualBaseUrl).origin;
-        if (urlOrigin === baseOrigin) {
-          console.log('✅ Same origin redirect:', url);
-          return url;
-        }
-      } catch (error) {
-        console.error('Error parsing URLs in redirect:', error);
-      }
-      
-      // Default to home page
+      // For any other case, redirect to home
       console.log('✅ Default redirect to home');
-      return actualBaseUrl;
+      return baseUrl;
     },
   },
   pages: {
@@ -271,47 +250,11 @@ export const authOptions: NextAuthOptions = {
     error: '/login', // Redirect auth errors to login page
   },
   events: {
-    async signIn({ user, account, profile: _, isNewUser }) {
-      try {
-        console.log('SignIn event:', { user: user.email, account: account?.provider, isNewUser });
-        
-        // Clear any cached session data to force refresh
-        if (typeof window !== 'undefined') {
-          // This will be executed on client-side
-          localStorage.removeItem('nextauth.session-token');
-          sessionStorage.removeItem('nextauth.session-token');
-        }
-      } catch (error) {
-        console.error('Error in signIn event:', error);
-      }
+    async signIn({ user, account, isNewUser }) {
+      console.log('🔄 SignIn event:', { user: user.email, provider: account?.provider, isNewUser });
     },
     async signOut({ session, token }) {
-      try {
-        console.log('SignOut event:', { user: session?.user?.email || token?.email });
-        
-        // Clear any cached session data
-        if (typeof window !== 'undefined') {
-          // This will be executed on client-side
-          localStorage.removeItem('nextauth.session-token');
-          sessionStorage.removeItem('nextauth.session-token');
-        }
-      } catch (error) {
-        console.error('Error in signOut event:', error);
-      }
-    },
-    async createUser({ user }) {
-      try {
-        console.log('User created:', user.email);
-      } catch (error) {
-        console.error('Error in createUser event:', error);
-      }
-    },
-    async session({ session }) {
-      try {
-        console.log('Session event:', { user: session.user?.email });
-      } catch (error) {
-        console.error('Error in session event:', error);
-      }
+      console.log('🔄 SignOut event:', { user: session?.user?.email || token?.email });
     },
   },
 };

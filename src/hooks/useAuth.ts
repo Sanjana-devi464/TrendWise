@@ -12,17 +12,35 @@ export function useAuth() {
   }, []);
 
   const isLoading = status === 'loading' || !isHydrated;
-  const isAuthenticated = status === 'authenticated' && !!session;
+  const isAuthenticated = status === 'authenticated' && !!session?.user;
   const isUnauthenticated = status === 'unauthenticated';
 
   // Force session refresh when needed
   const refreshSession = async () => {
     try {
-      await update();
+      console.log('🔄 Refreshing session...');
+      const updatedSession = await update();
+      console.log('✅ Session refreshed:', updatedSession);
+      return updatedSession;
     } catch (error) {
-      console.error('Error refreshing session:', error);
+      console.error('❌ Error refreshing session:', error);
+      throw error;
     }
   };
+
+  // Debug logging
+  useEffect(() => {
+    if (isHydrated) {
+      console.log('🔍 Auth state:', {
+        status,
+        hasSession: !!session,
+        hasUser: !!session?.user,
+        userEmail: session?.user?.email,
+        isAuthenticated,
+        isUnauthenticated
+      });
+    }
+  }, [status, session, isAuthenticated, isUnauthenticated, isHydrated]);
 
   return {
     session,

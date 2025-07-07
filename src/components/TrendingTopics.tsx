@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, memo } from 'react';
 import { useSession } from 'next-auth/react';
-import { TrendingUp, Sparkles, Activity, Hash, Globe, Loader2, Zap, ArrowRight } from 'lucide-react';
+import { Sparkles, Activity, Hash, Globe, Loader2, Zap, ArrowRight } from 'lucide-react';
 
 interface TrendingTopic {
   title: string;

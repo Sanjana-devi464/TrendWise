@@ -19,7 +19,7 @@ function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const { session, isAuthenticated } = useAuth();
+  const { session } = useAuth();
   const router = useRouter();
   const profileRef = useRef<HTMLDivElement>(null);
   
